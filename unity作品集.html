@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>类RPG 地牢冒险 - Unity 作品集</title>
+    <style>
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #0a0a0f;
+            color: #d4c9a8;
+            line-height: 1.6;
+        }
+        a { color: #c9a84c; text-decoration: none; transition: color .3s; }
+        a:hover { color: #e8c85a; }
+        img { max-width: 100%; display: block; }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0f; }
+        ::-webkit-scrollbar-thumb { background: #3a3528; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #5a4f3a; }
+
+        /* ===== Navigation ===== */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(10, 10, 15, .92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(201, 168, 76, .15);
+            padding: 0 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px;
+        }
+        nav .logo { font-size: 1.15rem; font-weight: 700; color: #c9a84c; letter-spacing: 1px; }
+        nav ul { list-style: none; display: flex; gap: 1.5rem; }
+        nav ul li a {
+            font-size: .85rem; color: #a89878; text-transform: uppercase;
+            letter-spacing: 1px; transition: color .3s; padding: .3rem 0;
+            border-bottom: 2px solid transparent;
+        }
+        nav ul li a:hover, nav ul li a.active { color: #c9a84c; border-bottom-color: #c9a84c; }
+        .menu-toggle { display: none; background: none; border: none; color: #c9a84c; font-size: 1.5rem; cursor: pointer; }
+
+        /* ===== Hero ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            background: radial-gradient(ellipse at center, #1a1a2a 0%, #0a0a0f 70%);
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: .5; pointer-events: none;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 800;
+            color: #f0e0b0;
+            text-shadow: 0 0 60px rgba(201, 168, 76, .3);
+            letter-spacing: 4px;
+            position: relative;
+            margin-bottom: .5rem;
+        }
+        .hero h1 small {
+            display: block;
+            font-size: 1rem;
+            font-weight: 400;
+            color: #8a7a5a;
+            letter-spacing: 8px;
+            margin-top: .5rem;
+        }
+        .hero p {
+            font-size: 1.05rem; color: #a89878; max-width: 600px;
+            margin: 1rem auto 2rem; position: relative;
+        }
+        .hero .scroll-hint {
+            position: absolute; bottom: 2rem;
+            color: #5a4f3a; font-size: 1.3rem; letter-spacing: 3px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+
+        /* ===== Sections ===== */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px; margin: 0 auto;
+        }
+        .section-title {
+            font-size: 2rem; font-weight: 700; color: #f0e0b0;
+            text-align: center; letter-spacing: 2px;
+            margin-bottom: .5rem;
+        }
+        .section-subtitle {
+            text-align: center; color: #6a5f4a; font-size: .95rem;
+            margin-bottom: 3rem; letter-spacing: 1px;
+        }
+        .section-divider {
+            width: 60px; height: 3px; background: linear-gradient(90deg, transparent, #c9a84c, transparent);
+            margin: 0 auto 3rem; border-radius: 2px;
+        }
+
+        /* ===== Overview Cards ===== */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        .overview-card {
+            background: linear-gradient(145deg, #14141f, #1a1a2a);
+            border: 1px solid rgba(201, 168, 76, .1);
+            border-radius: 12px; padding: 2rem;
+            text-align: center; transition: transform .3s, border-color .3s, box-shadow .3s;
+        }
+        .overview-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(201, 168, 76, .3);
+            box-shadow: 0 12px 40px rgba(0,0,0,.4);
+        }
+        .overview-card h3 { color: #c9a84c; margin-bottom: .5rem; font-size: 1.1rem; }
+        .overview-card p { color: #8a7a5a; font-size: .9rem; }
+
+        /* ===== Screenshot Grid ===== */
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .screenshot-card {
+            background: #14141f;
+            border: 1px solid rgba(201, 168, 76, .1);
+            border-radius: 10px; overflow: hidden;
+            cursor: pointer;
+            transition: transform .3s, box-shadow .3s, border-color .3s;
+        }
+        .screenshot-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(201, 168, 76, .3);
+            box-shadow: 0 8px 30px rgba(0,0,0,.5);
+        }
+        .screenshot-card .img-wrap {
+            position: relative; overflow: hidden;
+            aspect-ratio: 16 / 9;
+            background: #0a0a0f;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .screenshot-card .img-wrap .placeholder {
+            display: none;
+        }
+        .screenshot-card .img-wrap img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        /* Only show placeholder when image fails to load */
+        .screenshot-card .img-wrap.img-error img { display: none; }
+        .screenshot-card .img-wrap.img-error .placeholder {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #14141f 0%, #1a1a2a 50%, #0f0f18 100%);
+            color: #3a3528;
+            font-size: 3rem; font-weight: 700;
+            transition: all .3s;
+        }
+        .screenshot-card:hover .img-wrap.img-error .placeholder {
+            color: #5a4f3a;
+            background: linear-gradient(135deg, #1a1a2a 0%, #222 50%, #14141f 100%);
+        }
+        .screenshot-card .info {
+            padding: 1rem 1.2rem;
+        }
+        .screenshot-card .info h4 {
+            color: #c9a84c; font-size: .95rem; margin-bottom: .25rem;
+            letter-spacing: .5px;
+        }
+        .screenshot-card .info p {
+            color: #7a6f5a; font-size: .82rem; line-height: 1.5;
+        }
+
+        /* ===== Tech Section ===== */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+        .tech-card {
+            background: #14141f;
+            border: 1px solid rgba(201, 168, 76, .08);
+            border-radius: 10px; padding: 1.5rem;
+            transition: border-color .3s;
+        }
+        .tech-card:hover { border-color: rgba(201, 168, 76, .25); }
+        .tech-card h3 {
+            color: #c9a84c; font-size: 1rem; margin-bottom: .75rem;
+            padding-bottom: .5rem;
+            border-bottom: 1px solid rgba(201, 168, 76, .1);
+        }
+        .tech-card ul { list-style: none; }
+        .tech-card ul li {
+            color: #8a7a5a; font-size: .85rem; padding: .3rem 0;
+            padding-left: 1rem; position: relative;
+        }
+        .tech-card ul li::before {
+            content: '▸'; position: absolute; left: 0; color: #c9a84c;
+        }
+
+        /* ===== Lightbox ===== */
+        .lightbox {
+            display: none;
+            position: fixed; z-index: 2000; inset: 0;
+            background: rgba(0,0,0,.92);
+            backdrop-filter: blur(8px);
+            align-items: center; justify-content: center;
+            padding: 2rem;
+            cursor: pointer;
+        }
+        .lightbox.active { display: flex; }
+        .lightbox img {
+            max-width: 90vw; max-height: 85vh;
+            border-radius: 8px;
+            box-shadow: 0 20px 80px rgba(0,0,0,.8);
+            cursor: default;
+        }
+        .lightbox .lightbox-info {
+            position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+            color: #a89878; font-size: .9rem;
+            text-align: center;
+        }
+        .lightbox .close {
+            position: fixed; top: 1.5rem; right: 2rem;
+            color: #5a4f3a; font-size: 2rem; cursor: pointer;
+            transition: color .3s; background: none; border: none;
+        }
+        .lightbox .close:hover { color: #c9a84c; }
+
+        /* ===== Footer ===== */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid rgba(201, 168, 76, .08);
+            color: #3a3528;
+            font-size: .85rem;
+        }
+        footer strong { color: #6a5f4a; }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            nav { padding: 0 1rem; }
+            nav ul { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; right: 0;
+                background: rgba(10,10,15,.98); padding: 1rem 2rem; border-bottom: 1px solid rgba(201,168,76,.15); }
+            nav ul.open { display: flex; }
+            .menu-toggle { display: block; }
+            section { padding: 3rem 1rem; }
+            .screenshot-grid { grid-template-columns: 1fr; }
+            .overview-grid { grid-template-columns: 1fr; }
+            .tech-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== Navigation ===== -->
+<nav>
+    <div class="logo">类RPG</div>
+    <ul id="nav-menu">
+        <li><a href="#overview" class="active">概览</a></li>
+        <li><a href="#tutorial">新手教程</a></li>
+        <li><a href="#hall">大厅</a></li>
+        <li><a href="#tech">技术亮点</a></li>
+        <li><a href="index.html" style="color:rgba(201,168,76,.5)">← 返回主页</a></li>
+    </ul>
+    <button class="menu-toggle" onclick="document.getElementById('nav-menu').classList.toggle('open')">☰</button>
+</nav>
+
+<!-- ===== Hero ===== -->
+<header class="hero">
+    <h1>
+        类RPG · 地牢冒险
+        <small>个人独立创作作品</small>
+    </h1>
+    <p>
+    基于 Unity 开发的一款低多边形风格地牢探险游戏<br>
+    包含完整的新手教程、大厅、UI界面制作与控制、区域传送等游戏场景功能
+    </p>
+    <div class="scroll-hint">▼ 向下滚动</div>
+</header>
+
+<!-- ===== Overview ===== -->
+<section id="overview">
+    <h2 class="section-title">项目概览</h2>
+    <div class="section-divider"></div>
+    <p class="section-subtitle">基于 Unity 引擎构建的完整 RPG 游戏框架，包含战斗、收集、解谜与探索核心循环</p>
+    <div class="overview-grid">
+<div class="overview-card">
+            <h3>战斗与成长</h3>
+            <p>玩家操控小骑士，使用鼠标左右键攻击，具备跳跃与恢复机制</p>
+        </div>
+        <div class="overview-card">
+            <h3>背包与合成</h3>
+            <p>10格背包网格，支持物品拾取、堆叠显示、装备与消耗品管理</p>
+        </div>
+        <div class="overview-card">
+            <h3>传送与导航</h3>
+            <p>地牢探险与大厅枢纽连接，交互式传送门实现场景切换</p>
+        </div>
+        <div class="overview-card">
+            <h3>系统设置</h3>
+            <p>完整设置菜单：按键自定义映射、音效/BGM独立调节及退出功能</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===== Tutorial Scene ===== -->
+<section id="tutorial">
+    <h2 class="section-title">新手教程场景</h2>
+    <div class="section-divider"></div>
+    <p class="section-subtitle">“小骑士”在先知指引下，从零开始学习移动、交互、战斗与生存技巧</p>
+
+    <div class="screenshot-grid" id="tutorial-grid">
+        <div class="screenshot-card" data-title="场景全貌" data-desc="新手教程关卡全景俯瞰，Low Poly 地牢布局与关卡设计">
+            <div class="img-wrap"><div class="placeholder">01</div><img src="portfolio_screenshots/新手教程全景.png" alt="场景全貌" loading="lazy"></div>
+            <div class="info"><h4>场景全貌</h4><p>新手教程关卡全景俯瞰，Low Poly 地牢布局与关卡设计</p></div>
+        </div>
+        <div class="screenshot-card" data-title="玩家角色" data-desc="KayKit 骑士角色近距离特写">
+            <div class="img-wrap"><div class="placeholder">02</div><img src="portfolio_screenshots/角色特写.png" alt="玩家角色" loading="lazy"></div>
+            <div class="info"><h4>玩家角色</h4><p>KayKit 骑士角色近距离特写</p></div>
+        </div>
+        <div class="screenshot-card" data-title="移动操作" data-desc="WASD 移动按键与视角控制提示">
+            <div class="img-wrap"><div class="placeholder">03</div><img src="portfolio_screenshots/wsad提示.png" alt="移动操作" loading="lazy"></div>
+            <div class="info"><h4>移动操作</h4><p>WASD 移动按键与视角控制提示</p></div>
+        </div>
+        <div class="screenshot-card" data-title="游戏控件" data-desc="按键映射设置面板，支持键位自定义与保存">
+            <div class="img-wrap"><div class="placeholder">04</div><img src="portfolio_screenshots/游戏控件.png" alt="游戏控件" loading="lazy"></div>
+            <div class="info"><h4>游戏控件</h4><p>按键映射设置面板，支持键位自定义与保存</p></div>
+        </div>
+        <div class="screenshot-card" data-title="血瓶恢复" data-desc="受伤后按 R 键使用血瓶恢复血量">
+            <div class="img-wrap"><div class="placeholder">05</div><img src="portfolio_screenshots/血瓶恢复提示.png" alt="血瓶恢复" loading="lazy"></div>
+            <div class="info"><h4>血瓶恢复</h4><p>受伤后按 R 键使用血瓶恢复血量</p></div>
+        </div>
+        <div class="screenshot-card" data-title="受伤扣血" data-desc="场景中的陷阱与怪物攻击造成扣血反馈">
+            <div class="img-wrap"><div class="placeholder">06</div><img src="portfolio_screenshots/受伤扣血.png" alt="受伤扣血" loading="lazy"></div>
+            <div class="info"><h4>受伤扣血</h4><p>场景中的陷阱与怪物攻击造成扣血反馈</p></div>
+        </div>
+        <div class="screenshot-card" data-title="跳跃操作" data-desc="按下 Space 键跳跃通过地牢障碍物">
+            <div class="img-wrap"><div class="placeholder">07</div><img src="portfolio_screenshots/跳跃提示.png" alt="跳跃操作" loading="lazy"></div>
+            <div class="info"><h4>跳跃操作</h4><p>按下 Space 键跳跃通过地牢障碍物</p></div>
+        </div>
+        <div class="screenshot-card" data-title="背包系统" data-desc="背包网格界面，物品拾取、堆叠与装备管理">
+            <div class="img-wrap"><div class="placeholder">08</div><img src="portfolio_screenshots/背包.png" alt="背包系统" loading="lazy"></div>
+            <div class="info"><h4>背包系统</h4><p>背包网格界面，物品拾取、堆叠与装备管理</p></div>
+        </div>
+        <div class="screenshot-card" data-title="角色气泡" data-desc="NPC 头顶气泡提示，按 E 键交互触发对话">
+            <div class="img-wrap"><div class="placeholder">09</div><img src="portfolio_screenshots/角色气泡.png" alt="角色气泡" loading="lazy"></div>
+            <div class="info"><h4>角色气泡</h4><p>NPC 头顶气泡提示，按 E 键交互触发对话</p></div>
+        </div>
+        <div class="screenshot-card" data-title="对话面板" data-desc="对话面板弹出，按空格键推进剧情">
+            <div class="img-wrap"><div class="placeholder">10</div><img src="portfolio_screenshots/对话面板.png" alt="对话面板" loading="lazy"></div>
+            <div class="info"><h4>对话面板</h4><p>对话面板弹出，按空格键推进剧情</p></div>
+        </div>
+        <div class="screenshot-card" data-title="设置面板" data-desc="游戏设置，包含控件映射与退出功能">
+            <div class="img-wrap"><div class="placeholder">11</div><img src="portfolio_screenshots/设置面板.png" alt="设置面板" loading="lazy"></div>
+            <div class="info"><h4>设置面板</h4><p>游戏设置，包含控件映射与退出功能</p></div>
+        </div>
+        <div class="screenshot-card" data-title="音频控制" data-desc="独立调节游戏音效和 BGM 音量">
+            <div class="img-wrap"><div class="placeholder">12</div><img src="portfolio_screenshots/游戏音频.png" alt="音频控制" loading="lazy"></div>
+            <div class="info"><h4>音频控制</h4><p>独立调节游戏音效和 BGM 音量</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== Hall Scene ===== -->
+<section id="hall">
+    <h2 class="section-title">大厅场景</h2>
+    <div class="section-divider"></div>
+    <p class="section-subtitle">枢纽区域，连接副本/Boss 入口，展示场景美术与传送机制</p>
+
+    <div class="screenshot-grid" id="hall-grid">
+        <div class="screenshot-card" data-title="大厅全景" data-desc="大厅场景全貌，展示空间布局与地牢氛围">
+            <div class="img-wrap"><div class="placeholder">13</div><img src="portfolio_screenshots/大厅全景.png" alt="大厅全景" loading="lazy"></div>
+            <div class="info"><h4>大厅全景</h4><p>大厅场景全貌，展示空间布局与地牢氛围</p></div>
+        </div>
+        <div class="screenshot-card" data-title="大厅传送门" data-desc="连接大厅与副本的传送入口">
+            <div class="img-wrap"><div class="placeholder">14</div><img src="portfolio_screenshots/大厅传送门.png" alt="大厅传送门" loading="lazy"></div>
+            <div class="info"><h4>大厅传送门</h4><p>连接大厅与副本的传送入口</p></div>
+        </div>
+        <div class="screenshot-card" data-title="副本1传送门" data-desc="通往副本1的传送门入口">
+            <div class="img-wrap"><div class="placeholder">15</div><img src="portfolio_screenshots/副本1传送门.png" alt="副本1传送门" loading="lazy"></div>
+            <div class="info"><h4>副本1传送门</h4><p>通往副本1的传送门入口</p></div>
+        </div>
+        <div class="screenshot-card" data-title="副本2传送门" data-desc="通往副本2的传送门入口">
+            <div class="img-wrap"><div class="placeholder">16</div><img src="portfolio_screenshots/副本2传送门.png" alt="副本2传送门" loading="lazy"></div>
+            <div class="info"><h4>副本2传送门</h4><p>通往副本2的传送门入口</p></div>
+        </div>
+        <div class="screenshot-card" data-title="Boss传送门" data-desc="通往 Boss 战场的传送门入口">
+            <div class="img-wrap"><div class="placeholder">17</div><img src="portfolio_screenshots/Boss传送门.png" alt="Boss传送门" loading="lazy"></div>
+            <div class="info"><h4>Boss传送门</h4><p>通往 Boss 战场的传送门入口</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== Tech Highlights ===== -->
+<section id="tech">
+    <h2 class="section-title">技术亮点</h2>
+    <div class="section-divider"></div>
+    <p class="section-subtitle">从角色控制、UI交互到资源管理的完整实现</p>
+    <div class="tech-grid">
+        <div class="tech-card">
+            <h3>核心控制系统</h3>
+            <ul>
+                <li>WASD 角色移动与 Space 跳跃</li>
+                <li>鼠标左/右键 攻击与特殊技能</li>
+                <li>R 键实时血量恢复机制</li>
+                <li>F 键交互系统（对话/拾取/传送）</li>
+                <li>自定义按键映射面板（可重置与保存）</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>界面与交互</h3>
+            <ul>
+                <li>The Stone 石头主题UI & 中世纪风格边框</li>
+                <li>动态血条与血瓶数量（5/5）显示</li>
+                <li>10格背包网格与物品堆叠（红宝石10个）</li>
+                <li>多级设置菜单（设置 → 控件/音频/退出）</li>
+                <li>独立 BGM/游戏音效滑动条控制</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>脚本系统</h3>
+            <ul>
+                <li>PlayerController（移动/跳跃/攻击）</li>
+                <li>InteractionManager（NPC/传送门/物品交互）</li>
+                <li>InventoryManager（物品拾取/使用/UI刷新）</li>
+                <li>SettingsController（按键/音频数据存储）</li>
+                <li>SceneTeleport（跨场景传送与DontDestroyOnLoad）</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>场景与模型</h3>
+            <ul>
+                <li>低多边形地牢/Low Poly 美术风格</li>
+                <li>SimpleDungeons 素材包应用</li>
+                <li>大厅 → 副本跨场景传送布局</li>
+                <li>复杂地牢光照与阴影烘焙</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>资源管理</h3>
+            <ul>
+                <li>KayKit 角色包（小骑士）</li>
+                <li>Polygonal 怪物包（盔甲卫士、Boss等）</li>
+                <li>SimpleDungeons 地牢环境素材</li>
+                <li>The Stone UI 主题包与自定义Sprite</li>
+                <li>场景音效与BGM管理</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>游戏机制</h3>
+            <ul>
+                <li>多波次怪物自动生成机制</li>
+                <li>Boss战 AI 行为逻辑与攻击反馈</li>
+                <li>先知的剧情对话系统（多分支/按空格推进）</li>
+                <li>法阵陷阱与宝箱交互机制</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ===== Lightbox ===== -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="close" onclick="closeLightbox(null)">✕</button>
+    <img id="lightbox-img" src="" alt="">
+    <div class="lightbox-info" id="lightbox-info"></div>
+</div>
+
+<!-- ===== Footer ===== -->
+<footer>
+    <p>制作工具：<strong>Unity</strong> · 模型资源：KayKit / Polygonal / SimpleDungeons · UI 主题：The Stone</p>
+    <p style="margin-top:.5rem;">© 2026 类RPG 地牢冒险 · Unity 个人作品集</p>
+</footer>
+
+<!-- ===== Scripts ===== -->
+<script>
+    // ── Lightbox ──
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxInfo = document.getElementById('lightbox-info');
+
+    document.querySelectorAll('.screenshot-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const img = card.querySelector('img');
+            const title = card.dataset.title || '';
+            const desc = card.dataset.desc || '';
+            if (img && img.src) {
+                lightboxImg.src = img.src;
+                lightboxInfo.textContent = title + ' — ' + desc;
+                lightbox.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    });
+
+    function closeLightbox(e) {
+        if (e && e.target !== lightbox && e.target !== e.currentTarget?.querySelector?.('.close')) return;
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { lightbox.classList.remove('active'); document.body.style.overflow = ''; }
+    });
+
+    // ── Scroll Spy Nav ──
+    const navLinks = document.querySelectorAll('nav ul li a');
+    const sections = document.querySelectorAll('section, header');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(sec => {
+            const top = sec.offsetTop - 120;
+            if (window.scrollY >= top) current = sec.id || '';
+        });
+        navLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+        });
+    });
+
+    // ── Close mobile menu on link click ──
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            document.getElementById('nav-menu').classList.remove('open');
+        });
+    });
+
+    // ── Image fallback: show placeholder only on error ──
+    document.querySelectorAll('.screenshot-card img').forEach(img => {
+        img.addEventListener('error', () => {
+            img.closest('.img-wrap').classList.add('img-error');
+        });
+    });
+</script>
+</body>
+</html>

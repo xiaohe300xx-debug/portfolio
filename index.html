@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>何良俊 — 游戏地编作品集</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:wght@300..700&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════ RESET & BASE ══════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:#0d0d10;
+  color:#f0efed;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+img{display:block;width:100%;height:100%;object-fit:cover}
+a{color:inherit;text-decoration:none}
+
+/* ══════════════════ CUSTOM PROPERTIES ══════════════════ */
+:root{
+  --bg:#0d0d10;
+  --surface:#151518;
+  --card:#16161a;
+  --text:#f0efed;
+  --text2:#8a8a92;
+  --text3:#6a6a72;
+  --accent:#ff6b35;
+  --accent-hover:#ff8c42;
+  --accent-dim:#e04e1a;
+  --accent-glow:rgba(255,107,53,0.1);
+  --border:rgba(255,255,255,0.06);
+  --border-hover:rgba(255,107,53,0.25);
+  --max-w:1280px;
+  --font-display:'Space Grotesk',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+
+/* ══════════════════ ANIMATIONS ══════════════════ */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(28px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+@keyframes targetSpin{
+  0%{transform:translate(-50%,-50%) rotate(0deg)}
+  100%{transform:translate(-50%,-50%) rotate(360deg)}
+}
+@keyframes targetPulse{
+  0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  50%{opacity:0.85;transform:translate(-50%,-50%) scale(1.008)}
+}
+@keyframes gridShift{
+  0%{background-position:0 0}
+  100%{background-position:58px 58px}
+}
+.reveal{opacity:0}
+.reveal.visible{animation:fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) forwards}
+.reveal-delay-1{animation-delay:0.1s}
+.reveal-delay-2{animation-delay:0.2s}
+.reveal-delay-3{animation-delay:0.3s}
+.reveal-delay-4{animation-delay:0.4s}
+
+/* Hero text stagger (CSS-only, no flicker) */
+.hero-content > *{opacity:0;animation:fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) forwards}
+.hero-content > *:nth-child(1){animation-delay:0.1s}
+.hero-content > *:nth-child(2){animation-delay:0.2s}
+.hero-content > *:nth-child(3){animation-delay:0.3s}
+.hero-content > *:nth-child(4){animation-delay:0.4s}
+.hero-content > *:nth-child(5){animation-delay:0.5s}
+.hero-content > *:nth-child(6){animation-delay:0.6s}
+.hero-content > *:nth-child(7){animation-delay:0.7s}
+
+/* ══════════════════ SCANLINES ══════════════════ */
+body::after{
+  content:'';position:fixed;inset:0;
+  pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(
+    0deg,transparent,transparent 2px,rgba(255,255,255,0.008) 2px,rgba(255,255,255,0.008) 4px
+  );
+}
+
+/* ══════════════════ UTILITY ══════════════════ */
+.container{max-width:var(--max-w);margin:0 auto;padding:0 24px}
+.section{padding:100px 0}
+.section-label{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:12px;
+}
+.section-title{
+  font-family:var(--font-display);
+  font-size:clamp(28px,5vw,48px);
+  font-weight:700;
+  line-height:1.1;
+  margin-bottom:16px;
+}
+.section-sub{
+  color:var(--text2);
+  font-size:14px;
+  max-width:580px;
+  line-height:1.7;
+  margin-bottom:48px;
+}
+.accent-bar{
+  width:40px;height:3px;
+  background:var(--accent);
+  margin-bottom:16px;
+}
+
+
+/* ══════════════════ NAV ══════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  z-index:100;
+  padding:16px 24px;
+  background:rgba(13,13,16,0.85);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  display:flex;justify-content:space-between;align-items:center;
+  height:64px;
+}
+.nav-logo{
+  font-family:var(--font-mono);
+  font-size:12px;
+  color:var(--text2);
+  letter-spacing:0.1em;
+}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--text3);
+  transition:color 0.2s;
+  position:relative;
+}
+.nav-links a::after{
+  content:'';display:block;
+  width:0;height:1px;
+  background:var(--accent);
+  transition:width 0.3s cubic-bezier(0.16,1,0.3,1);
+  margin-top:2px;
+}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a:hover::after{width:100%}
+.nav-toggle{display:none;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer}
+
+/* ══════════════════ HERO ══════════════════ */
+.hero{
+  min-height:100dvh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  padding-top:64px;
+  position:relative;
+  overflow:hidden;
+}
+.hero-content{padding:0 24px 0 0;position:relative;z-index:2}
+.hero-content::before{
+  content:'';display:block;
+  width:80px;height:2px;
+  background:var(--accent);
+  margin-bottom:12px;
+}
+.hero-content::after{
+  content:'';display:block;
+  width:2px;height:80px;
+  background:var(--accent);
+  position:absolute;top:0;left:0;
+}
+.hero-label{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.18em;
+  color:var(--accent);
+  margin-bottom:24px;
+}
+.hero-name{
+  font-family:var(--font-display);
+  font-size:clamp(48px,7.5vw,88px);
+  font-weight:700;
+  line-height:1;
+  margin-bottom:8px;
+}
+.hero-name span{color:var(--accent)}
+.hero-line{
+  width:80px;height:3px;
+  background:var(--accent);
+  margin:24px 0;
+}
+.hero-sub{
+  font-family:var(--font-display);
+  font-size:clamp(16px,2vw,22px);
+  color:var(--text2);
+  margin-bottom:20px;
+}
+.hero-desc{
+  color:var(--text3);
+  font-size:13px;
+  max-width:440px;
+  line-height:1.8;
+  margin-bottom:32px;
+}
+.hero-cta{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--accent);
+  color:#0d0d10;
+  padding:12px 28px;
+  border-radius:4px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  font-weight:600;
+  transition:background 0.2s;
+}
+.hero-cta:hover{background:var(--accent-hover)}
+.hero-cta2{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-left:16px;
+  color:var(--text2);
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:0.1em;
+  transition:color 0.2s;
+}
+.hero-cta2:hover{color:var(--accent)}
+
+/* Hero visual - geometric motif (matches PPTX cover) */
+.hero-visual{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  min-height:60vh;
+  overflow:hidden;
+}
+/* Blueprint grid */
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(#18181C 1px,transparent 1px),
+    linear-gradient(90deg,#18181C 1px,transparent 1px);
+  background-size:58px 58px;
+}
+/* Corner bracket: top-left */
+.hero-corner-tl{
+  position:absolute;top:24px;left:0;
+  width:80px;height:2px;
+  background:var(--accent);
+}
+.hero-corner-tl::after{
+  content:'';display:block;
+  width:2px;height:80px;
+  background:var(--accent);
+  position:absolute;top:0;left:0;
+}
+/* Corner bracket: bottom-right */
+.hero-corner-br{
+  position:absolute;bottom:24px;right:0;
+  width:64px;height:2px;
+  background:var(--accent);
+}
+.hero-corner-br::after{
+  content:'';display:block;
+  width:2px;height:56px;
+  background:var(--accent);
+  position:absolute;bottom:0;right:0;
+}
+/* Target (标靶) motif - concentric circles + crosshairs */
+.hero-target{
+  position:absolute;
+  /* Center positioned ~37% from top, ~26% from right (matching PPTX proportion) */
+  top:37%;right:26%;
+  transform:translate(50%,-50%);
+  animation:targetPulse 6s ease-in-out infinite;
+}
+.hero-circle-1{
+  width:307px;height:307px;
+  border:1.5px solid var(--accent);
+  border-radius:50%;
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+}
+.hero-circle-2{
+  width:230px;height:230px;
+  border:1px solid var(--accent);
+  border-radius:50%;
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+}
+.hero-circle-3{
+  width:154px;height:154px;
+  border:0.5px solid rgba(255,255,255,0.4);
+  border-radius:50%;
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  animation:targetSpin 60s linear infinite;
+}
+.hero-cross-h{
+  width:307px;height:1px;
+  background:var(--accent);
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+}
+.hero-cross-v{
+  width:1px;height:307px;
+  background:var(--accent);
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+}
+.hero-dot{
+  width:12px;height:12px;
+  background:var(--accent);
+  border:1px solid var(--accent);
+  border-radius:50%;
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:2;
+  animation:targetPulse 3s ease-in-out infinite;
+}
+
+/* ══════════════════ ABOUT ══════════════════ */
+.about-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:64px;
+  align-items:start;
+}
+.about-text{font-size:14px;color:var(--text2);line-height:1.9}
+.about-text strong{color:var(--text);font-weight:600}
+.about-text p+p{margin-top:16px}
+.about-highlights{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+}
+.about-stat{text-align:left}
+.about-stat-num{
+  font-family:var(--font-display);
+  font-size:36px;
+  font-weight:700;
+  color:var(--accent);
+  line-height:1;
+}
+.about-stat-label{
+  font-family:var(--font-mono);
+  font-size:9px;
+  color:var(--text3);
+  letter-spacing:0.1em;
+  margin-top:6px;
+}
+
+/* ══════════════════ CARDS (unified) ══════════════════ */
+.card-grid-3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+.card-grid-2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:6px;
+  overflow:hidden;
+  transition:border-color 0.3s, transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.card:hover{
+  border-color:var(--border-hover);
+  transform:translateY(-4px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.3);
+}
+.card-img{
+  width:100%;aspect-ratio:16/9;
+  background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text3);
+  font-family:var(--font-mono);
+  font-size:28px;
+  border-bottom:1px solid var(--border);
+  overflow:hidden;
+}
+.card-img img{
+  width:100%;height:100%;
+  object-fit:contain;
+}
+.card-body{padding:16px 18px 20px}
+.card-year{
+  font-family:var(--font-mono);
+  font-size:8px;
+  color:var(--accent);
+  letter-spacing:0.05em;
+  margin-bottom:2px;
+}
+.card-cat{
+  font-family:var(--font-mono);
+  font-size:8px;
+  color:var(--text3);
+  margin-bottom:8px;
+}
+.card-title{
+  font-family:var(--font-display);
+  font-size:15px;
+  font-weight:600;
+  line-height:1.2;
+  margin-bottom:6px;
+}
+.card-desc{
+  font-size:12px;
+  color:var(--text2);
+  line-height:1.6;
+}
+
+/* ══════════════════ AWARDS GRID ══════════════════ */
+.awards-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+.award-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:14px 16px;
+  transition:border-color 0.3s;
+}
+.award-card:hover{border-color:var(--border-hover)}
+.award-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:4px;
+}
+.award-year{
+  font-family:var(--font-mono);
+  font-size:8px;
+  color:var(--accent);
+}
+.award-level{
+  font-family:var(--font-mono);
+  font-size:7px;
+  letter-spacing:0.08em;
+}
+.award-level.national{color:var(--accent)}
+.award-level.provincial{color:var(--text3)}
+.award-comp{
+  font-family:var(--font-display);
+  font-size:12px;
+  font-weight:600;
+  margin-bottom:2px;
+}
+.award-name{
+  font-size:10px;
+  color:var(--text2);
+}
+
+/* ══════════════════ SKILLS ══════════════════ */
+.skills-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:40px;
+}
+.skill-group-label{
+  font-family:var(--font-mono);
+  font-size:10px;
+  color:var(--accent);
+  letter-spacing:0.12em;
+  margin-bottom:12px;
+}
+.skill-chips{
+  display:flex;flex-wrap:wrap;gap:8px;
+}
+.skill-chip{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:6px 14px;
+  font-family:var(--font-mono);
+  font-size:10px;
+  color:var(--text2);
+  transition:border-color 0.2s,color 0.2s, transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.skill-chip:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+  transform:translateY(-2px);
+}
+
+/* ══════════════════ PROJECT CARDS (large) ══════════════════ */
+.project-large .card-img{aspect-ratio:16/9}
+.project-large .card-body{padding:20px}
+.project-large .card-title{font-size:17px}
+
+/* ══════════════════ DIVIDER ══════════════════ */
+.divider{
+  height:1px;
+  background:var(--border);
+  margin:60px 0;
+}
+
+/* ══════════════════ FOOTER ══════════════════ */
+footer{
+  padding:48px 0 32px;
+  border-top:1px solid var(--border);
+  text-align:center;
+}
+.footer-name{
+  font-family:var(--font-display);
+  font-size:28px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+.footer-contact{
+  font-family:var(--font-display);
+  font-size:18px;
+  color:var(--accent);
+  margin-bottom:16px;
+}
+.footer-meta{
+  font-family:var(--font-mono);
+  font-size:9px;
+  color:var(--text3);
+  letter-spacing:0.08em;
+}
+
+/* ══════════════════ RESPONSIVE ══════════════════ */
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;padding-top:80px}
+  .hero-content{padding:0}
+  .hero-visual{display:none}
+  .hero-name{font-size:clamp(36px,10vw,56px)}
+  .about-grid{grid-template-columns:1fr;gap:40px}
+  .about-highlights{justify-self:start}
+  .card-grid-3{grid-template-columns:1fr}
+  .card-grid-2{grid-template-columns:1fr}
+  .awards-grid{grid-template-columns:1fr 1fr}
+  .skills-grid{grid-template-columns:1fr;gap:32px}
+  .nav-links{display:none}
+  .nav-toggle{display:block}
+  .nav-links.open{
+    display:flex;flex-direction:column;
+    position:absolute;top:64px;left:0;right:0;
+    background:rgba(13,13,16,0.98);
+    padding:24px;
+    border-bottom:1px solid var(--border);
+    gap:20px;
+  }
+}
+@media(max-width:600px){
+  .section{padding:60px 0}
+  .awards-grid{grid-template-columns:1fr}
+  .about-highlights{gap:16px}
+  .about-stat-num{font-size:28px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}
+}
+
+/* ══════════════════ LIGHTBOX ══════════════════ */
+.lightbox-overlay{
+  display:none;position:fixed;z-index:2000;inset:0;
+  background:rgba(0,0,0,.92);
+  backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;
+  padding:2rem;cursor:pointer;
+}
+.lightbox-overlay.active{display:flex}
+.lightbox-overlay img{
+  max-width:90vw;max-height:85vh;
+  border-radius:8px;
+  box-shadow:0 20px 80px rgba(0,0,0,.8);
+  cursor:default;
+}
+.lightbox-overlay .lightbox-info{
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
+  color:var(--text2);font-size:.9rem;text-align:center;
+}
+.lightbox-overlay .lightbox-close{
+  position:fixed;top:1.5rem;right:2rem;
+  color:var(--text3);font-size:2rem;cursor:pointer;
+  transition:color .3s;background:none;border:none;
+}
+.lightbox-overlay .lightbox-close:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="nav-logo">HE LIANGJUN</div>
+  <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+  <ul class="nav-links">
+    <li><a href="#about">关于</a></li>
+    <li><a href="#unity">Unity</a></li>
+    <li><a href="#modeling">建模</a></li>
+    <li><a href="#art">美术设计</a></li>
+    <li><a href="#ai">AI</a></li>
+    <li><a href="#awards">奖项</a></li>
+    <li><a href="#skills">技能</a></li>
+  </ul>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero container">
+  <div class="hero-content">
+    <h1 class="hero-name">何良俊</h1>
+    <div class="hero-line"></div>
+    <p class="hero-sub">三维场景 · 游戏地编 · AI 技术探索</p>
+    <p class="hero-desc">
+       专注游戏场景美术与三维环境创作，融合AI技术提升地编效率。
+    </p>
+    <a href="#unity" class="hero-cta">查看作品</a>
+    <a href="#about" class="hero-cta2">关于我 →</a>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-grid"></div>
+    <div class="hero-corner-tl"></div>
+    <div class="hero-corner-br"></div>
+    <div class="hero-target">
+      <div class="hero-circle-1"></div>
+      <div class="hero-circle-2"></div>
+      <div class="hero-circle-3"></div>
+      <div class="hero-cross-h"></div>
+      <div class="hero-cross-v"></div>
+      <div class="hero-dot"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ABOUT ═══ -->
+<section class="section reveal" id="about">
+  <div class="container">
+    <div class="accent-bar"></div>
+    <div class="section-label">About</div>
+    <h2 class="section-title">关于我</h2>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>我是<strong>何良俊</strong>，目标成为<strong>游戏地编师</strong>（Game Environment Artist）。</p>
+        <p><strong>Unity 场景整合（主要方向）：</strong>熟练在 Unity 中搭建游戏场景、布置光照、整合资源并实现交互逻辑，完成从关卡设计到场景打包的完整流程。</p>
+        <p><strong>三维建模与美术：</strong>熟练使用 Blender、C4D 进行场景建模、硬表面搭建与风格化渲染，为引擎整合提供美术资产支持。</p>
+        <p><strong>AI 辅助探索：</strong>搭建 AI 聊天框架，接入大语言模型 API，实现智能对话交互。探索 AI 在游戏场景与工具链中的落地应用。</p>
+        <p>参与多项学科竞赛并获国家级、省级奖项 6 项，持续在实践中打磨场景美术与引擎整合能力。</p>
+      </div>
+      <div class="about-highlights">
+        <div class="about-stat">
+          <div class="about-stat-num">6</div>
+          <div class="about-stat-label">竞赛奖项</div>
+        </div>
+        <div class="about-stat">
+          <div class="about-stat-num">4</div>
+          <div class="about-stat-label">项目作品</div>
+        </div>
+        <div class="about-stat">
+          <div class="about-stat-num">2</div>
+          <div class="about-stat-label">场景方向</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ UNITY ═══ -->
+<section class="section reveal" id="unity">
+  <div class="container">
+    <div class="accent-bar"></div>
+    <div class="section-label">Unity</div>
+    <h2 class="section-title">Unity 作品</h2>
+    <p class="section-sub">基于 Unity 引擎的游戏场景搭建、交互设计与资源整合实践。</p>
+    <div class="card-grid-3 reveal reveal-delay-1">
+      <div class="card">
+        <div class="card-img"><img src="portfolio_screenshots/大厅全景.png" alt="类RPG 地牢冒险" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-year">2025</div>
+          <div class="card-cat">Unity · RPG</div>
+          <div class="card-title">类RPG 地牢冒险</div>
+          <div class="card-desc">低多边风格地牢探险游戏，包含新手教程、大厅、UI界面制作与控制、区域传送等完整场景功能。<br><a href="unity作品集.html" style="color:var(--accent);text-decoration:underline">查看完整作品集 →</a></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-img"><img src="images/计算机设计大赛获奖产品图.png" alt="计算机设计大赛获奖产品" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-year">2025</div>
+          <div class="card-cat">Unity · Interactive</div>
+          <div class="card-title">计算机设计大赛作品</div>
+          <div class="card-desc">基于Unity开发的文化主题交互体验，负责场景搭建、光照系统与资源整合，获四川省一等奖及国家级三等奖。<br><a href="设计大赛.html" style="color:var(--accent);text-decoration:underline">了解更多 →</a></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-img"><img src="images/大富翁Unity场景.png" alt="大富翁 Unity 场景" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-year">2025</div>
+          <div class="card-cat">Unity · Game</div>
+          <div class="card-title">大富翁 Unity 场景</div>
+          <div class="card-desc">基于 Unity 构建的大富翁风格游戏场景，包含棋盘布局、交互元素与 UI 界面整合。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MODELING ═══ -->
+<section class="section reveal" id="modeling">
+  <div class="container">
+    <div class="accent-bar"></div>
+    <div class="section-label">3D Modeling</div>
+    <h2 class="section-title">建模方面</h2>
+    <p class="section-sub">使用 Blender 与 C4D 完成的场景建模、硬表面造型与氛围渲染练习。</p>
+    <div class="card-grid-3 reveal reveal-delay-1">
+      <div class="card">
+        <div class="card-img"><img src="images/Blender入门场景1.png" alt="Blender 入门场景" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-year">2025</div>
+          <div class="card-cat">Blender · Environment</div>
+          <div class="card-title">Blender 入门场景（一）</div>
+          <div class="card-desc">Blender 风格化场景搭建练习，包含地形布局、建筑结构与整体氛围把控。</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-img"><img src="images/Blender入门场景2.png" alt="Blender 入门场景" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-year">2025</div>
+          <div class="card-cat">Blender · Environment</div>
+          <div class="card-title">Blender 入门场景（二）</div>
+          <div class="card-desc">Blender 场景搭建进阶练习，强化地形编辑、光影布置与氛围渲染。</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-img"><img src="images/C4D建模入门全景.png" alt="C4D 建模入门全景" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-year">2024</div>
+          <div class="card-cat">C4D · Foundation</div>
+          <div class="card-title">C4D 建模入门全景</div>
+          <div class="card-desc">Cinema 4D 入门场景建模，探索光影氛围与材质表现。</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-grid-3 reveal reveal-delay-2" style="margin-top:20px">
+      <div class="card">
+        <div class="card-img"><img src="images/C4D建模入门部分细节图.png" alt="C4D 建模入门细节" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-year">2024</div>
+          <div class="card-cat">C4D · Detail</div>
+          <div class="card-title">C4D 建模入门细节</div>
+          <div class="card-desc">C4D 建模部分的细节展示，聚焦灯光渲染与局部造型刻画。</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-img"><img src="images/C4D进阶场景.png" alt="C4D 进阶场景" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-year">2024</div>
+          <div class="card-cat">C4D · Advanced</div>
+          <div class="card-title">C4D 进阶场景</div>
+          <div class="card-desc">进阶 Cinema 4D 场景搭建练习，注重复杂构图与氛围表达。</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-img"><img src="images/C4D进阶场景细节图.png" alt="C4D 进阶场景细节" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-year">2024</div>
+          <div class="card-cat">C4D · Advanced Detail</div>
+          <div class="card-title">C4D 进阶场景细节</div>
+          <div class="card-desc">进阶场景的局部细节渲染，展示材质处理与光影把控能力。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ART DESIGN ═══ -->
+<section class="section reveal" id="art">
+  <div class="container">
+    <div class="accent-bar"></div>
+    <div class="section-label">Art Design</div>
+    <h2 class="section-title">美术设计方面</h2>
+    <p class="section-sub">场景美术设计、光影氛围与视觉风格探索实践。</p>
+    <div class="card-grid-2 reveal reveal-delay-1">
+      <div class="card project-large">
+        <div class="card-img"><img src="images/计算机设计大赛获奖产品图1.png" alt="计算机设计大赛获奖产品" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-year">2025</div>
+          <div class="card-cat">Design · Interactive</div>
+          <div class="card-title">计算机设计大赛作品展示</div>
+          <div class="card-desc">文化主题交互体验项目的场景美术设计，涵盖造型构图、色彩搭配与光影氛围的美术把控。</div>
+        </div>
+      </div>
+      <div class="card project-large">
+        <div class="card-img"><img src="images/C4D进阶场景.png" alt="C4D 场景美术" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-year">2024</div>
+          <div class="card-cat">Design · Scene</div>
+          <div class="card-title">C4D 进阶场景美术</div>
+          <div class="card-desc">三维场景美术设计练习，注重场景叙事氛围、材质细节与光影层次。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AWARDS ═══ -->
+<section class="section reveal" id="awards">
+  <div class="container">
+    <div class="accent-bar"></div>
+    <div class="section-label">Achievements</div>
+    <h2 class="section-title">竞赛奖项</h2>
+    <p class="section-sub">在校期间累计获得国家级与省级竞赛奖项 6 项</p>
+    <div class="awards-grid reveal reveal-delay-1">
+      <div class="award-card">
+        <div class="award-header">
+          <span class="award-year">2025</span>
+          <span class="award-level provincial">省部级</span>
+        </div>
+        <div class="award-comp">中国大学生计算机设计大赛</div>
+        <div class="award-name">四川省一等奖</div>
+      </div>
+      <div class="award-card">
+        <div class="award-header">
+          <span class="award-year">2025</span>
+          <span class="award-level national">国家级</span>
+        </div>
+        <div class="award-comp">中国大学生计算机设计大赛</div>
+        <div class="award-name">国家级三等奖</div>
+      </div>
+      <div class="award-card">
+        <div class="award-header">
+          <span class="award-year">2024</span>
+          <span class="award-level national">国家级</span>
+        </div>
+        <div class="award-comp">全国大学生机器博弈大赛</div>
+        <div class="award-name">国家级二等奖</div>
+      </div>
+      <div class="award-card">
+        <div class="award-header">
+          <span class="award-year">2025</span>
+          <span class="award-level provincial">省部级</span>
+        </div>
+        <div class="award-comp">RAICOM 机器人开发者大赛</div>
+        <div class="award-name">四川省二等奖</div>
+      </div>
+      <div class="award-card">
+        <div class="award-header">
+          <span class="award-year">2025</span>
+          <span class="award-level national">国家级</span>
+        </div>
+        <div class="award-comp">RAICOM 机器人开发者大赛</div>
+        <div class="award-name">国家级二等奖</div>
+      </div>
+      <div class="award-card">
+        <div class="award-header">
+          <span class="award-year">2024</span>
+          <span class="award-level provincial">省部级</span>
+        </div>
+        <div class="award-comp">全国大学生机器博弈大赛</div>
+        <div class="award-name">省级奖项</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AI ═══ -->
+<section class="section reveal" id="ai">
+  <div class="container">
+    <div class="accent-bar"></div>
+    <div class="section-label">AI Technology</div>
+    <h2 class="section-title">AI 运用方面</h2>
+    <p class="section-sub">搭建 AI 聊天框架，接入大语言模型 API，实现智能对话交互。</p>
+    <div class="card-grid-2 reveal reveal-delay-1">
+      <div class="card project-large">
+        <div class="card-img"><img src="images/AI运用.png" alt="AI 运用" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-year">2025</div>
+          <div class="card-cat">AI · Framework</div>
+          <div class="card-title">AI 聊天框架搭建</div>
+          <div class="card-desc">搭建智能对话系统框架，接入大语言模型 API，实现多轮对话交互。可拓展为游戏 NPC 对话系统，支持自定义对话流程与上下文管理。</div>
+        </div>
+      </div>
+      <div class="card project-large">
+        <div class="card-img"><img src="images/AI运用到入门UE.png" alt="AI 运用到 UE" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-year">2025</div>
+          <div class="card-cat">AI · UE</div>
+          <div class="card-title">AI 辅助虚幻引擎入门</div>
+          <div class="card-desc">借助 AI 工具辅助学习 Unreal Engine 场景搭建，探索 AI 辅助编程与场景创作的落地方法。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SKILLS ═══ -->
+<section class="section reveal" id="skills">
+  <div class="container">
+    <div class="accent-bar"></div>
+    <div class="section-label">Skillset</div>
+    <h2 class="section-title">核心技能</h2>
+    <div class="skills-grid" style="margin-top:32px">
+      <div>
+        <div class="skill-group-label">场景建模</div>
+        <div class="skill-chips">
+          <span class="skill-chip">Blender</span>
+          <span class="skill-chip">Cinema 4D</span>
+          <span class="skill-chip">硬表面建模</span>
+          <span class="skill-chip">UV 与材质</span>
+        </div>
+      </div>
+      <div>
+        <div class="skill-group-label">引擎整合</div>
+        <div class="skill-chips">
+          <span class="skill-chip">Unity 场景搭建</span>
+          <span class="skill-chip">光照与烘焙</span>
+          <span class="skill-chip">资源管理</span>
+          <span class="skill-chip">UE 基础</span>
+        </div>
+      </div>
+      <div>
+        <div class="skill-group-label">AI 技术</div>
+        <div class="skill-chips">
+          <span class="skill-chip">AI 对话框架</span>
+          <span class="skill-chip">程序化生成</span>
+          <span class="skill-chip">AI 辅助材质</span>
+          <span class="skill-chip">Python</span>
+        </div>
+      </div>
+      <div>
+        <div class="skill-group-label">美术基础</div>
+        <div class="skill-chips">
+          <span class="skill-chip">造型与构图</span>
+          <span class="skill-chip">色彩与光影</span>
+          <span class="skill-chip">场景叙事</span>
+          <span class="skill-chip">PBR 流程</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LIGHTBOX ═══ -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lightbox-close" onclick="closeLightbox(null)">✕</button>
+  <img id="lightbox-img" src="" alt="">
+  <div class="lightbox-info" id="lightbox-info"></div>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="container">
+    <div class="footer-name">何良俊</div>
+    <div class="footer-contact">158-8489-8520</div>
+    <div class="footer-meta" style="margin-top:4px">xiaohe300xx@gmail.com</div>
+    <div class="footer-meta" style="margin-top:12px">© 2026 何良俊 · 个人作品集</div>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal with IntersectionObserver
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}
+  })
+},{threshold:0.15});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// ── Lightbox ──
+const lb=document.getElementById('lightbox');
+const lbImg=document.getElementById('lightbox-img');
+const lbInfo=document.getElementById('lightbox-info');
+
+document.querySelectorAll('.card').forEach(card=>{
+  card.addEventListener('click',e=>{
+    if(e.target.closest('a'))return; // don't open lightbox when clicking links
+    const img=card.querySelector('.card-img img');
+    const title=card.querySelector('.card-title');
+    const desc=card.querySelector('.card-desc');
+    if(img&&img.src){
+      lbImg.src=img.src;
+      let txt=title?title.textContent:'';
+      if(desc)txt+=' — '+desc.textContent.replace(/了解更多.*$/,'').replace(/查看完整作品集.*$/,'').trim();
+      lbInfo.textContent=txt;
+      lb.classList.add('active');
+      document.body.style.overflow='hidden';
+    }
+  });
+});
+
+function closeLightbox(e){
+  if(e&&e.target!==lb&&e.target!==e.currentTarget?.querySelector?.('.lightbox-close'))return;
+  lb.classList.remove('active');
+  document.body.style.overflow='';
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){lb.classList.remove('active');document.body.style.overflow=''}
+});
+</script>
+</body>
+</html>

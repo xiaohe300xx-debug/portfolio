@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>计算机设计大赛 — 作品详情</title>
+    <style>
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #0a0a0f;
+            color: #d4c9a8;
+            line-height: 1.6;
+        }
+        a { color: #c9a84c; text-decoration: none; transition: color .3s; }
+        a:hover { color: #e8c85a; }
+        img { max-width: 100%; display: block; }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0f; }
+        ::-webkit-scrollbar-thumb { background: #3a3528; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #5a4f3a; }
+
+        /* ===== Navigation ===== */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(10, 10, 15, .92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(201, 168, 76, .15);
+            padding: 0 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px;
+        }
+        nav .logo { font-size: 1.15rem; font-weight: 700; color: #c9a84c; letter-spacing: 1px; }
+        nav ul { list-style: none; display: flex; gap: 1.5rem; }
+        nav ul li a {
+            font-size: .85rem; color: #a89878; text-transform: uppercase;
+            letter-spacing: 1px; transition: color .3s; padding: .3rem 0;
+            border-bottom: 2px solid transparent;
+        }
+        nav ul li a:hover, nav ul li a.active { color: #c9a84c; border-bottom-color: #c9a84c; }
+        .menu-toggle { display: none; background: none; border: none; color: #c9a84c; font-size: 1.5rem; cursor: pointer; }
+
+        /* ===== Hero ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            background: radial-gradient(ellipse at center, #1a1a2a 0%, #0a0a0f 70%);
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: .5; pointer-events: none;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 800;
+            color: #f0e0b0;
+            text-shadow: 0 0 60px rgba(201, 168, 76, .3);
+            letter-spacing: 4px;
+            position: relative;
+            margin-bottom: .5rem;
+        }
+        .hero h1 small {
+            display: block;
+            font-size: 1rem;
+            font-weight: 400;
+            color: #8a7a5a;
+            letter-spacing: 8px;
+            margin-top: .5rem;
+        }
+        .hero p {
+            font-size: 1.05rem; color: #a89878; max-width: 600px;
+            margin: 1rem auto 2rem; position: relative;
+        }
+        .hero .scroll-hint {
+            position: absolute; bottom: 2rem;
+            color: #5a4f3a; font-size: 1.3rem; letter-spacing: 3px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+
+        /* ===== Sections ===== */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px; margin: 0 auto;
+        }
+        .section-title {
+            font-size: 2rem; font-weight: 700; color: #f0e0b0;
+            text-align: center; letter-spacing: 2px;
+            margin-bottom: .5rem;
+        }
+        .section-subtitle {
+            text-align: center; color: #6a5f4a; font-size: .95rem;
+            margin-bottom: 3rem; letter-spacing: 1px;
+        }
+        .section-divider {
+            width: 60px; height: 3px; background: linear-gradient(90deg, transparent, #c9a84c, transparent);
+            margin: 0 auto 3rem; border-radius: 2px;
+        }
+        .section-label {
+            text-align: center;
+            font-size: .75rem;
+            color: #8a7a5a;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: .5rem;
+        }
+
+        /* ===== Screenshot Grid ===== */
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .screenshot-card {
+            background: #14141f;
+            border: 1px solid rgba(201, 168, 76, .1);
+            border-radius: 10px; overflow: hidden;
+            cursor: pointer;
+            transition: transform .3s, box-shadow .3s, border-color .3s;
+        }
+        .screenshot-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(201, 168, 76, .3);
+            box-shadow: 0 8px 30px rgba(0,0,0,.5);
+        }
+        .screenshot-card .img-wrap {
+            position: relative; overflow: hidden;
+            aspect-ratio: 16 / 9;
+            background: #0a0a0f;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .screenshot-card .img-wrap .placeholder {
+            display: none;
+        }
+        .screenshot-card .img-wrap img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .screenshot-card .img-wrap.img-error img { display: none; }
+        .screenshot-card .img-wrap.img-error .placeholder {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #14141f 0%, #1a1a2a 50%, #0f0f18 100%);
+            color: #3a3528;
+            font-size: 3rem; font-weight: 700;
+            transition: all .3s;
+        }
+        .screenshot-card:hover .img-wrap.img-error .placeholder {
+            color: #5a4f3a;
+            background: linear-gradient(135deg, #1a1a2a 0%, #222 50%, #14141f 100%);
+        }
+        .screenshot-card .info {
+            padding: 1rem 1.2rem;
+        }
+        .screenshot-card .info h4 {
+            color: #c9a84c; font-size: .95rem; margin-bottom: .25rem;
+            letter-spacing: .5px;
+        }
+        .screenshot-card .info p {
+            color: #7a6f5a; font-size: .82rem; line-height: 1.5;
+        }
+
+        /* ===== Group Callout ===== */
+        .group-callout {
+            text-align: center;
+            margin: 4rem 0 1rem;
+        }
+        .group-callout .badge {
+            display: inline-block;
+            background: rgba(201, 168, 76, .08);
+            border: 1px solid rgba(201, 168, 76, .15);
+            color: #c9a84c;
+            font-size: .75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: .4rem 1.5rem;
+            border-radius: 4px;
+        }
+
+        /* ===== Footer ===== */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid rgba(201, 168, 76, .08);
+            color: #3a3528;
+            font-size: .85rem;
+        }
+        footer strong { color: #6a5f4a; }
+
+        /* ===== Lightbox ===== */
+        .lightbox {
+            display: none;
+            position: fixed; z-index: 2000; inset: 0;
+            background: rgba(0,0,0,.92);
+            backdrop-filter: blur(8px);
+            align-items: center; justify-content: center;
+            padding: 2rem;
+            cursor: pointer;
+        }
+        .lightbox.active { display: flex; }
+        .lightbox img {
+            max-width: 90vw; max-height: 85vh;
+            border-radius: 8px;
+            box-shadow: 0 20px 80px rgba(0,0,0,.8);
+            cursor: default;
+        }
+        .lightbox .lightbox-info {
+            position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+            color: #a89878; font-size: .9rem;
+            text-align: center;
+        }
+        .lightbox .close {
+            position: fixed; top: 1.5rem; right: 2rem;
+            color: #5a4f3a; font-size: 2rem; cursor: pointer;
+            transition: color .3s; background: none; border: none;
+        }
+        .lightbox .close:hover { color: #c9a84c; }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            nav { padding: 0 1rem; }
+            nav ul { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; right: 0;
+                background: rgba(10,10,15,.98); padding: 1rem 2rem; border-bottom: 1px solid rgba(201,168,76,.15); }
+            nav ul.open { display: flex; }
+            .menu-toggle { display: block; }
+            section { padding: 3rem 1rem; }
+            .screenshot-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== Navigation ===== -->
+<nav>
+    <div class="logo">设计大赛</div>
+    <ul id="nav-menu">
+        <li><a href="#concept" class="active">概念设计</a></li>
+        <li><a href="#product">产品应用</a></li>
+        <li><a href="index.html" style="color:rgba(201,168,76,.5)">← 返回主页</a></li>
+    </ul>
+    <button class="menu-toggle" onclick="document.getElementById('nav-menu').classList.toggle('open')">☰</button>
+</nav>
+
+<!-- ===== Hero ===== -->
+<header class="hero">
+    <h1>
+        计算机设计大赛
+        <small>文化主题交互体验项目 · 2025</small>
+    </h1>
+    <p>
+        以中国传统文化为内核，通过数字化手段进行现代表达<br>
+        涵盖概念设计与产品应用两个维度，探索文化IP的多元呈现
+    </p>
+    <div class="scroll-hint">▼ 向下滚动</div>
+</header>
+
+<!-- ===== Concept Design ===== -->
+<section id="concept">
+    <div class="section-label">Part 01</div>
+    <h2 class="section-title">概念设计</h2>
+    <div class="section-divider"></div>
+    <p class="section-subtitle">从传统文化元素中提炼视觉符号，通过数字化设计语言赋予新的表达</p>
+
+    <div class="screenshot-grid">
+        <div class="screenshot-card" data-title="音波" data-desc="以声音的波动为灵感，将传统文化韵律转化为可视化图形设计">
+            <div class="img-wrap"><div class="placeholder">01</div><img src="设计大赛/作品_音波.png" alt="音波" loading="lazy"></div>
+            <div class="info"><h4>音波</h4><p>以声音的波动为灵感，将传统文化韵律转化为可视化图形设计</p></div>
+        </div>
+        <div class="screenshot-card" data-title="指南针" data-desc="以古代指南针为原型，融合方位符号与方向指引的概念设计">
+            <div class="img-wrap"><div class="placeholder">02</div><img src="设计大赛/作品_指南针.png" alt="指南针" loading="lazy"></div>
+            <div class="info"><h4>指南针</h4><p>以古代指南针为原型，融合方位符号与方向指引的概念设计</p></div>
+        </div>
+        <div class="screenshot-card" data-title="小孔成像" data-desc="源自古代墨家的小孔成像原理，以光学现象演绎文化智慧">
+            <div class="img-wrap"><div class="placeholder">03</div><img src="设计大赛/作品_小孔.png" alt="小孔成像" loading="lazy"></div>
+            <div class="info"><h4>小孔成像</h4><p>源自古代墨家的小孔成像原理，以光学现象演绎文化智慧</p></div>
+        </div>
+        <div class="screenshot-card" data-title="日食" data-desc="以天象日食为题材，将自然现象与传统文化意象相结合">
+            <div class="img-wrap"><div class="placeholder">04</div><img src="设计大赛/作品_日食.png" alt="日食" loading="lazy"></div>
+            <div class="info"><h4>日食</h4><p>以天象日食为题材，将自然现象与传统文化意象相结合</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== Product Application ===== -->
+<section id="product">
+    <div class="group-callout">
+        <span class="badge">Part 02 · 从概念到实物</span>
+    </div>
+    <h2 class="section-title">产品应用</h2>
+    <div class="section-divider"></div>
+    <p class="section-subtitle">将概念设计落地为可感知的文创产品，探索传统文化在生活场景中的实际应用</p>
+
+    <div class="screenshot-grid">
+        <div class="screenshot-card" data-title="礼盒包装" data-desc="文化主题礼盒设计，将传统纹样与现代包装结构相结合">
+            <div class="img-wrap"><div class="placeholder">05</div><img src="设计大赛/产品_礼盒.png" alt="礼盒包装" loading="lazy"></div>
+            <div class="info"><h4>礼盒包装</h4><p>文化主题礼盒设计，将传统纹样与现代包装结构相结合</p></div>
+        </div>
+        <div class="screenshot-card" data-title="镜子" data-desc="以传统美学为灵感的镜子产品设计，融合文化符号与实用功能">
+            <div class="img-wrap"><div class="placeholder">06</div><img src="设计大赛/产品_镜子.jpg" alt="镜子" loading="lazy"></div>
+            <div class="info"><h4>镜子</h4><p>以传统美学为灵感的镜子产品设计，融合文化符号与实用功能</p></div>
+        </div>
+        <div class="screenshot-card" data-title="手提袋" data-desc="文化主题手提袋设计，兼顾视觉美感与日常使用的便携需求">
+            <div class="img-wrap"><div class="placeholder">07</div><img src="设计大赛/产品_手提袋.png" alt="手提袋" loading="lazy"></div>
+            <div class="info"><h4>手提袋</h4><p>文化主题手提袋设计，兼顾视觉美感与日常使用的便携需求</p></div>
+        </div>
+        <div class="screenshot-card" data-title="柜灯" data-desc="融入传统元素的柜灯产品设计，以光影营造文化氛围">
+            <div class="img-wrap"><div class="placeholder">08</div><img src="设计大赛/产品_柜灯.jpg" alt="柜灯" loading="lazy"></div>
+            <div class="info"><h4>柜灯</h4><p>融入传统元素的柜灯产品设计，以光影营造文化氛围</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== Lightbox ===== -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="close" onclick="closeLightbox(null)">✕</button>
+    <img id="lightbox-img" src="" alt="">
+    <div class="lightbox-info" id="lightbox-info"></div>
+</div>
+
+<!-- ===== Footer ===== -->
+<footer>
+    <p>作品类别：<strong>中国大学生计算机设计大赛</strong> · 文化主题交互体验项目</p>
+    <p style="margin-top:.5rem;">© 2026 何良俊 · 计算机设计大赛作品详情</p>
+</footer>
+
+<!-- ===== Scripts ===== -->
+<script>
+    // ── Scroll Spy Nav ──
+    const navLinks = document.querySelectorAll('nav ul li a');
+    const sections = document.querySelectorAll('section, header');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(sec => {
+            const top = sec.offsetTop - 120;
+            if (window.scrollY >= top) current = sec.id || '';
+        });
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('#')) {
+                link.classList.toggle('active', href === '#' + current);
+            }
+        });
+    });
+
+    // ── Close mobile menu on link click ──
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            document.getElementById('nav-menu').classList.remove('open');
+        });
+    });
+
+    // ── Lightbox ──
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxInfo = document.getElementById('lightbox-info');
+
+    document.querySelectorAll('.screenshot-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const img = card.querySelector('img');
+            const title = card.dataset.title || '';
+            const desc = card.dataset.desc || '';
+            if (img && img.src) {
+                lightboxImg.src = img.src;
+                lightboxInfo.textContent = title + ' — ' + desc;
+                lightbox.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    });
+
+    function closeLightbox(e) {
+        if (e && e.target !== lightbox && e.target !== e.currentTarget?.querySelector?.('.close')) return;
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { lightbox.classList.remove('active'); document.body.style.overflow = ''; }
+    });
+
+    // ── Image fallback: show placeholder only on error ──
+    document.querySelectorAll('.screenshot-card img').forEach(img => {
+        img.addEventListener('error', () => {
+            img.closest('.img-wrap').classList.add('img-error');
+        });
+    });
+</script>
+</body>
+</html>
